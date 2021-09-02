@@ -1,9 +1,9 @@
-# Содержание папки tests
+# Contents of tests folder
 :+1:    :metal: :metal:    :+1:
 ----
 
-### Структура папки tests
-- test_configs - конфиги экспериментов с разными колбэками
-    - multiclass - конфиги для задачи мультикласс классификации
-- test_config_runner - файл для тестирования multiclass конфигов
-    - команда запуска тестирования multiclass: ```pytest -v -m test_multiclass_classification```
+### Tests folder structure
+- test_configs - experiment configs with diffrent callbacks
+    - multiclass - multiclass classification configs
+- test_config_runner - file for testing multiclass
+    - testing command for multiclass: ```pytest -v -m test_multiclass_classification```

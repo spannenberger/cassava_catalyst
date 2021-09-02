@@ -1,25 +1,25 @@
-# Содержание папки src
+# Contents of src folder
 :+1:    :metal: :metal:    :+1:
 ----
 
-### Структура папки src
-- callbacks - папка с общими колбэками
-    - convert_callbacks - папка с колбэками конвертаций
-        - onnx_save_callback - конвертация модели в onnx 
-        - quantization - квантизация модели
-        - torchscript_save_callback - конвертация модели в torchscript
-    - logger_callbacks - папка с колбэками для логгирования эксперимента, как во время эксперимента, так и после
-        - mlflow_image_logger - колбэк с помощью которого происходит логгирование фотографий, моделей, конфигов в mlflow
-        - tensorboard_image_logger - колбэк с помощью которого происходит логгирование фотографий в tensorboard
-- classification - папка с реализацией решения задач multiclass классификации
-- models - папка со всеми моделями, которые можно использовать
-    - models_classes - файл с классами моделей для разных задач
-    - models_fabrics - файл с фабрикой моделей
-    - models - классы разных архитектур моделей
-- utils - папка с необходимыми инструментами
-### Структура папки classification
-- callbacks - папка с кастомными колбэками
-- \__init__.py - файл, в котором мы инициализируем, импортируем нужные нам инструменты как из каталиста, так и наши кастомные
-- dataset.py - файл, в котором мы работаем с полученными данные из датасета
-- SupervisedRunner.py - Кастомный runner нашего эксперимента
-- transform.py - файл-парсер, который применяет указанные аугментации к данным (light, medium, hard)
+### sct folder structure
+- callbacks - folder with shared callbacks
+    - convert_callbacks - folder with convertation callbacks
+        - onnx_save_callback - converting the model to onnx
+        - quantization - model quantization
+        - torchscript_save_callback - converting the model to torchscript
+    - logger_callbacks - folder with callbacks for logging the experiment, both during the experiment and after
+        - mlflow_image_logger - callback with which there is a logging of photos, models, configs in mlflow
+        - tensorboard_image_logger - a callback with which photos are logged into tensorboard
+- classification - folder with the implementation of solving multiclass classification problems
+- models - folder with all models that can be used
+    - models_classes - file with model classes for different tasks
+    - models_fabrics - model factory file
+    - models - classes of different model architectures
+- utils - folder with the necessary tools
+### Classification folder structure
+- callbacks - folder with custom callbacks
+- \__init__.py - the file in which we initialize, import the tools we need both from the catalist and our custom
+- dataset.py - the file in which we work with the received data from the dataset
+- SupervisedRunner.py - Custom runner of our experiment
+- transform.py - parser file that applies the specified augmentations to data (light, medium, hard)
