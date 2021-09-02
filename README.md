@@ -111,7 +111,7 @@
         l_norm: if you are using ln_structured you need to specify l_norm.
   ```
 
-- quantization callback квантизирует модель :neutral_face:
+- quantization callback - quantize model :neutral_face:
   ```
     Args:
       logdir: path to folder for saving
