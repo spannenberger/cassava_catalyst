@@ -149,6 +149,6 @@ notebooks/src
 notebooks/*.txt
 notebooks/config
 our_models/
-cassava-leaf-disease-classification
+cassava-leaf-disease-classification-2
 .DS_Store
 crossval_log/

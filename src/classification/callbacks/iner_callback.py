@@ -48,26 +48,6 @@ class MainInerCallback(Callback):
         with self.subm_file.open(mode='w') as file:
             file.write("\n".join(subm)+"\n")
 
-
-@Registry
-class MultilabelInerCallback(MainInerCallback):
-
-    def __init__(self, subm_file, **kwargs):
-        super().__init__(subm_file)
-        self.act = Sigmoid()
-        self.loss_f = BCELoss(reduction='none')
-
-    def on_batch_end(self, state: IRunner):
-        if state.is_valid_loader:
-            self.paths += state.batch["image_name"]
-            targets = state.batch['targets'].detach().cpu()
-            logits = state.batch["logits"].detach().cpu().type(torch.DoubleTensor)
-            self.targets += targets.tolist()
-            logits = self.act(logits)
-            self.losses += list(self.loss_f(logits, targets))
-            self.preds += state.batch['for_metrics'].tolist()
-
-
 @Registry
 class MulticlassInerCallback(MainInerCallback):
 
