@@ -3,28 +3,28 @@
 ----
 ### Content
 - [User guide](#user-guide)
-  * [Repository Structure](#структура-репозитория)
-  * [Instructions for using the repository](#инструкция-по-использованию-репозитория)
-- [Информация о конвертации моделей](#информация-о-конвертации-моделей)
-- [Информация о моделях](#информация-о-моделях)
+  * [Repository Structure](#repository-structure)
+  * [Instructions for using the repository](#instructions-for-using-the-repository)
+- [Convertation model info](#convertation-model-info)
+- [Model info](#model-info)
 - [Training run](#training-run)
 # User guide
-### Структура репозитория
-- [classifications_shells](#training-run) - папка, содержащая скрипты запуска решений задач классификации
-- [config](./config) - папка с конфигами эксперимента, в которых мы можем изменять: модель, путь до данных, шедулеры, коллбэки и тд
-    * [Multiclass](config/classification/multiclass/train_multiclass.yml) - конфиг мультикласс классификации
-- [src](src/) - папка с основными файлами проекта, в которую добавляются новые шедулеры, модели, коллбэки и тд
-- [docker-compose.yml](#test-in-docker) - конфиг файл для докера
-- [requirements.txt](/requirements.txt) - файл с библиотеками и инструментами, которые нам нужны в проектах
+### Repository Structure
+- [classifications_shells](#training-run) - folder which contains running scripts for multiclass tasks
+- [config](./config) - folder with experiment config in which we can modify: train model, data paths, shedulers, callbacks and etc 
+    * [Multiclass](config/classification/multiclass/train_multiclass.yml) - multiclass classification config
+- [src](src/) - folder with core files: callbacks, custom runner, loggers and etc
+- [docker-compose.yml](#test-in-docker) - config file for docker
+- [requirements.txt](/requirements.txt) - file with libs, tools for our repository
 ---
-### Инструкция по использованию репозитория
-- [Multiclass](#запуск-и-изменение-multiclass-решения)
-- [Callbacks](#использование-колбэков-в-пайплайне)
- ### Запуск и изменение multiclass решения
-   - Склонировать репозиторий
-   -  Запустить команду ```pip install -r requirements.txt```
-   -  Для изменения, подключения данных обучения:
-       - По стандарту данные идут в формате:
+### Instructions for using the repository
+- [Multiclass](#how-to-use-multiclass-solution-for-your-tasks)
+- [Callbacks](#how-to-use-callbacks)
+ ### How to use multiclass solution for your tasks 
+   - Clone this repository
+   - Run command ```pip install -r requirements.txt```
+   -  How to change data structure and add into pipeline:
+       - Default data structure:
        ```
           train_dataset/
             - images/
@@ -40,10 +40,9 @@
                 ...
                 test_image_name_N.jpg
 
-           test_metadata.csv
            train_metadata.csv
         ```
-        - Структура csv файлов
+        - csv file structure
         ```
         "image_path":
           train_image_name_1.jpg,
@@ -56,75 +55,78 @@
           ...
           1
         ```
-       - Изменить в папке ```./config/classification/multiclass/train_multiclass.yml``` файл, прописав новые пути до данных в блоке ```data:```
-       - Подготовка данных к эксперименту происходит в ```./src/classification/SupervisedRunner.py``` в методе get_datasets класса ```MulticlassRunner```,
-       чтение данных во время эксперимента происходит в ```dataset.py```
-   - Изменение моделей обучения
-       - Изменить в ```train_multiclass.yml``` файле название модели (доступные модели можно посмотреть в таблице([Информация о моделях](#информация-о-моделях))
-   - Логирование эксперимента в mlflow
-   - Для отключения колбэков достаточно их закомментировать в config файле
-   - Для дообучения на своих моделях:
-     - Проверить, что данная модель реализована в пайплайне
-     - Создать в корне проекта папку ```our_models```
-     - Загрузить в данную папку вашу модель в формате .pth с названием файла "best". Пример: ```best.pth```
-     - Пример:
+       - Change ```./config/classification/multiclass/train_multiclass.yml``` file, adding new data paths in block ```data:```
+       - Data setup for our experiment occur ```./src/classification/SupervisedRunner.py``` in ```get_datasets``` method. Data reading occur in ```dataset.py```
+   - How to change train model
+       - In ```train_multiclass.yml``` file change model name (find them in table([Model info](#model-info))
+   - Logging expirement to mlflow:
+      - In ```./config/classification/multilabel/train_multilabel.yml``` file add urls and your experiment name (if you want it local do not fill url field)
+       ```
+       loggers:
+            mlflow:
+       ```
+   - To turn off callback just comment it in config file
+   - How to retrain your local model:
+     - Check that in your model exists in our pipeline (check model table ([Model info](#model-info)))
+     - Create a folder in the root of your project
+     - Load your local model into your model folder in .pth formatПример: ```./our_model/best.pth```
+     - Example:
      ```
      model:
-        _target_: Densenet121 # имя клаccа. Сам класс будет сконструирован в registry по этому имени
+        _target_: Densenet121 # model class name. The class itself will be constructed in the registry by this name
         mode: Classification
         num_classes: &num_classes 2
-        path: 'our_models/best.pth' # Путь до расположения вашей локальной модели
-        is_local: True # True если обучаете локально загруженную модель
-        diff_classes_flag: True # True, если есть разница в кол-ве классов
-        old_num_classes: 18 # Если diff_classes_flag=True, то указать кол-во классов в предобученной модели
+        path: 'our_models/best.pth' # path to your local model
+        is_local: True # True if your train your local model
+        diff_classes_flag: True # True if you want train your model to another class number
+        old_num_classes: 18 # If diff_classes_flag=True, add your class number in pre-trained model
      ```
-### Использование колбэков в пайплайне
-- prunning callback прунит параметры во время и/или после обучения.
-:neutral_face:**Стоит отметить, что при использовании данного колбэка при обучении multilabel и metric learninng не будет работать конвертация моделей в onnx и torchscript**:neutral_face:
+### How to use callbacks 
+- prunning callback pruned parametrs while/after training
   ```
     Args:
-        pruning_fn: функция из torch.nn.utils.prune module.
-            Возможные prunning_fn в пайплайне: 'l1_unstructured', 'random_unstructured', 
-            'ln_structured', 'random_structured'
-            Смотри документацию pytorch: 
+        pruning_fn: function from torch.nn.utils.prune module
+            or your based on BasePruningMethod. Can be string e.g.
+            `"l1_unstructured"`. See pytorch docs for more details.
             https://pytorch.org/tutorials/intermediate/pruning_tutorial.html
-        amount: количество параметров для обрезки.
-            Если с плавающей точкой, должно быть от 0,0 до 1,0 и
-            представляют собой долю параметров, подлежащих сокращению.
-            Если int, он представляет собой абсолютное число
-            параметров для обрезки.
-        keys_to_prune: Cписок строк. Определяет
-            какой тензор в модулях будет обрезан.
-        prune_on_epoch_end: флаг bool определяет вызвать или нет
-            pruning_fn в конце эпохи.
-        prune_on_stage_end: флаг bool определяет вызвать или нет
-            pruning_fn в конце стейджа.
-        remove_reparametrization_on_stage_end: если True тогда вся
-            перепараметризация pre-hooks и tensors с маской
-            будет удален в конце стейджа.
-        layers_to_prune: список строк - имена модулей, которые нужно удалить.
-            Если не указано ни одного, то будет обрезан каждый модуль в
-            модели.
-        dim: если вы используете structured pruning method вы должны
-            указать dimension.
-        l_norm: если вы используете ln_structured вы должны указать l_norm.
+        amount: quantity of parameters to prune.
+            If float, should be between 0.0 and 1.0 and
+            represent the fraction of parameters to prune.
+            If int, it represents the absolute number
+            of parameters to prune.
+        keys_to_prune: list of strings. Determines
+            which tensor in modules will be pruned.
+        prune_on_epoch_end: bool flag determines call or not
+            to call pruning_fn on epoch end.
+        prune_on_stage_end: bool flag determines call or not
+            to call pruning_fn on stage end.
+        remove_reparametrization_on_stage_end: if True then all
+            reparametrization pre-hooks and tensors with mask
+            will be removed on stage end.
+        layers_to_prune: list of strings - module names to be pruned.
+            If None provided then will try to prune every module in
+            model.
+        dim: if you are using structured pruning method you need
+            to specify dimension.
+        l_norm: if you are using ln_structured you need to specify l_norm.
   ```
 
 - quantization callback квантизирует модель :neutral_face:
   ```
     Args:
-      logdir: путь до папки модели после квантизации
-      qconfig_spec (Dict, optional): конфиг квантизации в PyTorch формате.
+      logdir: path to folder for saving
+      filename: filename
+      qconfig_spec (Dict, optional): quantization config in PyTorch format.
           Defaults to None.
       dtype (Union[str, Optional[torch.dtype]], optional):
-          Тип весов после квантизации.
+          Type of weights after quantization.
           Defaults to "qint8".
   ```
-- CheckpointCallback - сохраняет n лучших моделей
-  - best.pth - лучшая модель за обучение
-  - last.pth - модель с последней эпохи
-  - stage.1_full.pth, ..., stage.n_full.pth - лучшие n моделей за обучение
-# Информация о моделях
+- CheckpointCallback - save ```n``` best models
+  - best.pth - best model after training
+  - last.pth - model from last epoch
+  - stage.1_full.pth, ..., stage.n_full.pth - best n model 
+# Model info
 
 | model | onnx  | torchscript | embedding_size |
 | :---: | :-: | :-: | :-: |
