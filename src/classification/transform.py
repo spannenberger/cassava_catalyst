@@ -40,8 +40,3 @@ class CustomAugmentator():
         elif mode == 'OneOf':
             return A.OneOf(augs_list)
         raise Exception('Unknown mode')
-
-
-if __name__ == "__main__":
-    a = CustomAugmentator().transforms("config/classification/augmentations/medium.yml")
-    print(a)
