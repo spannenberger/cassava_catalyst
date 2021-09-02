@@ -5,7 +5,10 @@ from models.models_classes import MetricLearningModel
 
 
 class ModelsFabric:
-
+    """ A class for creating models for classification tasks with 
+    the possibility of extension for other tasks, for example, metric_learning
+    """
+    
     @classmethod
     def create_model(cls, model, mode, **kwargs):
         if mode == 'Classification':
