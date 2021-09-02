@@ -33,21 +33,9 @@ def test_config_runner(config_list, path):
         runner: ConfigRunner = get_config_runner(expdir=args.expdir, config=config)
         runner.run()
 
-@mark.test_metric_learning
-def test_metric_learning_configs():
-    path = Path('src/tests/test_configs').absolute() / 'metric_learning'
-    config_list = os.listdir(str(path))
-    test_config_runner(config_list, str(path))
-
 @mark.test_multiclass_classification
 def test_multiclass_classification():
     path=  Path('src/tests/test_configs').absolute() / 'multiclass'
-    config_list = os.listdir(str(path))
-    test_config_runner(config_list, str(path))
-
-@mark.test_multilabel_classification
-def test_multilabel_classification():
-    path = Path('src/tests/test_configs').absolute() / 'multilabel'
     config_list = os.listdir(str(path))
     test_config_runner(config_list, str(path))
 

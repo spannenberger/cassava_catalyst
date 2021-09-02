@@ -1,6 +1,6 @@
 model:
-  _target_: EfficientNetb3 # имя клаccа. Сам класс будет сконструирован в registry по этому имени
-  num_classes: &num_classes 2
+  _target_: ResNet50 # имя клаccа. Сам класс будет сконструирован в registry по этому имени
+  num_classes: &num_classes 5
   mode: Classification
   # path: 'our_models/best.pth' # Путь до расположения вашей локальной модели
   # is_local: False # True если обучаете локально загруженную модель
@@ -26,7 +26,7 @@ engine: # Параметры для distributed training и NVIDIA Apex
   _target_: DeviceEngine
   # device: cuda:0
 
-class_names: &class_names ["sigi", "other"]
+class_names: &class_names ["Cassava Bacterial Blight (CBB)", "Cassava Brown Streak Disease (CBSD)", "Cassava Green Mottle (CGM)", "Cassava Mosaic Disease (CMD)", "Healthy"]
 
 loggers:
 # Встроенные логеры каталиста
@@ -35,7 +35,7 @@ loggers:
     _target_: ConsoleLogger
   mlflow:
     _target_: CustomMLflowLogger
-    experiment: 'sigi'
+    experiment: 'cassava'
     class_names: *class_names
     # tracking_uri: http://mlflow.ddc.itnap.ru:5000/
     # registry_uri: https://storage.yandexcloud.net/
@@ -87,43 +87,22 @@ stages: # Словарь всех стадий Catalyst, для обучения
         prune_on_epoch_end: True # флаг для прунинга в конце стэйджа
         amount: 0.5 # количество параметров для обрезки. Если с плавающей точкой, должно быть от 0,0 до 1,0 и представляют собой часть параметров, подлежащих сокращению. Если int, он представляет собой абсолютное число параметров для обрезки.
         l_norm: 2
-      # quantization:
-      #   _target_: QuantizationCallback
-      #   logdir: "./logs" # Путь для сохранение модели после квантизации
-      # Подключение кастомных колбэков
-      #(Возможные колбэки: ./src_multilabel/callbacks/)
-      # onnx_saver: # Конвертация в onnx формат
-      #   _target_: OnnxSaveCallback
-      #   out_dir: "./logs/onnx"
-      #   checkpoint_names: ["best", "best_full"]
-      # torchscript_saver: # Конвертация в torchscript формат
-      #   _target_: TorchscriptSaveCallback
-      #   out_dir: "./logs/torchsript"
-      #   checkpoint_names: ["last", "best_full"]
       infer:
         _target_: MulticlassInerCallback
         subm_file: "./crossval_log/preds.csv"
       custom_mlflow: # Логирование ошибочных фотографий в mlflow
         _target_: MLFlowMulticlassLoggingCallback
         logging_image_number: 10
-      custom_tensorboard: # Логирование ошибочных фотографий в tensorboard
-        _target_: TensorboardMulticlassLoggingCallback
-        logging_image_number: 10
-      triton:
-        _target_: TritonConfigCreator
-        conf_path: "./logs/triton/config.pbtxt"
-        # instance_group params
-        # Читай доку Тритона (https://github.com/bytedance/triton-inference-server/blob/master/docs/model_configuration.md#instance-groups)
-        count: 1 # Количество запущенных инстансов модели на каждом gpu/cpu
-        kind: KIND_GPU # Есть два возможных параметра - KIND_CPU (для работы на CPU) и KIND_GPU (для работы на GPU)
-        gpus: [ 0 ] # Если kind: KIND_GPU, то нужно указать какие именно GPU будут использоваться
+      # custom_tensorboard: # Логирование ошибочных фотографий в tensorboard
+      #   _target_: TensorboardMulticlassLoggingCallback
+      #   logging_image_number: 10
+        
     data: # Подключение данных и параметров обучения
       shuffle: false
-      train_dir: "./train_dataset_sigi/"
-      train_image_dir: "images/train"
-      test_image_dir: "images/test"
-      train_meta: "train_metadata.csv"
-      test_meta: "test_metadata.csv"
+      train_dir: "./cassava-leaf-disease-classification-2/"
+      train_image_dir: "images/train_images"
+      train_meta: "train.csv"
+      valid_size: 0.2
       transform_path: "config/augmentations/light.yml" # Режим аугментаций данных (Возможны: light, medium, hard(./config/augmentations/))
     loaders: &loaders
       batch_size: 1 # Размер батча для всех стейджей
