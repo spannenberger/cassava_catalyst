@@ -8,6 +8,7 @@
 - [Convertation model info](#convertation-model-info)
 - [Model info](#model-info)
 - [Training run](#training-run)
+- [Docker run](#docker-run)
 # User guide
 ### Repository Structure
 - [classifications_shells](#training-run) - folder which contains running scripts for multiclass tasks
@@ -161,4 +162,15 @@ tensorboard --logdir=logs/ui # for our pipeline
 # Run mlflow 
 mlflow ui
 
+```
+# Docker run 
+```
+# build ur project, u need to do this only once
+docker-compose build
+
+# run docker ur container
+docker-compose up
+
+# shutdown ur container
+docker-compose stop
 ```
